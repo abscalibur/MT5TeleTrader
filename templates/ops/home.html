@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Metaauto Ops</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='ops/channels.css') }}">
+</head>
+<body>
+    <main class="shell">
+        <nav class="top-nav" aria-label="Ops navigation">
+            <a class="nav-link active" href="/" aria-current="page">Home</a>
+            <a class="nav-link" href="/ops/channels">Channels</a>
+            <a class="nav-link" href="/ops/messages-read">MessageRead</a>
+            <a class="nav-link" href="/ops/interpreted-trades">Interpreted Trades</a>
+            <a class="nav-link" href="/ops/jobs">Jobs</a>
+        </nav>
+
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Metaauto Ops</p>
+                <h1>Telegram Sync Console</h1>
+                <p class="lede">
+                    Manage Telegram channel discovery and inspect the MessageRead rows collected from enabled channels.
+                    Review interpreted trades and run scheduled jobs from one place.
+                </p>
+            </div>
+        </section>
+
+        <section class="cards" aria-label="Ops pages">
+            <a class="card-link" href="/ops/channels">
+                <span class="eyebrow">Channel Model</span>
+                <h2>Channels</h2>
+                <p>Review discovered Telegram channels, toggle enabled state, and run a manual channel sync.</p>
+                <span class="card-meta">Auto sync every {{ channel_sync_interval_minutes }} minutes</span>
+            </a>
+
+            <a class="card-link" href="/ops/messages-read">
+                <span class="eyebrow">MessageRead Model</span>
+                <h2>MessageRead</h2>
+                <p>View stored messages, run message sync, and process pending signals into interpreted trades.</p>
+                <span class="card-meta">
+                    Messages every {{ message_sync_interval_minutes }} minutes, AI every {{ trade_interpretation_interval_minutes }} minutes
+                </span>
+            </a>
+
+            <a class="card-link" href="/ops/interpreted-trades">
+                <span class="eyebrow">InterpretedTrade Model</span>
+                <h2>Interpreted Trades</h2>
+                <p>Inspect parsed trade signals with source channel, source message, symbol, side, and stop loss.</p>
+                <span class="card-meta">AI interpretation every {{ trade_interpretation_interval_minutes }} minutes</span>
+            </a>
+
+            <a class="card-link" href="/ops/jobs">
+                <span class="eyebrow">Scheduler</span>
+                <h2>Scheduled Jobs</h2>
+                <p>See next run times, last run status, and manually run any registered background job.</p>
+                <span class="card-meta">
+                    Channels, messages, trade interpretation, and execution every {{ trade_execution_interval_minutes }} minute(s)
+                </span>
+            </a>
+        </section>
+    </main>
+</body>
+</html>

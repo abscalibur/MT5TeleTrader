@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MessageRead</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='ops/channels.css') }}">
+    <script defer src="{{ url_for('static', path='ops/messages_read.js') }}"></script>
+</head>
+<body>
+    <main class="shell">
+        <nav class="top-nav" aria-label="Ops navigation">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/ops/channels">Channels</a>
+            <a class="nav-link active" href="/ops/messages-read" aria-current="page">MessageRead</a>
+            <a class="nav-link" href="/ops/interpreted-trades">Interpreted Trades</a>
+            <a class="nav-link" href="/ops/jobs">Jobs</a>
+        </nav>
+
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Ops</p>
+                <h1>MessageRead</h1>
+                <p class="lede">
+                    Inspect stored Telegram messages fetched from enabled channels. Automatic sync runs every
+                    {{ message_sync_interval_minutes }} minutes, looking back {{ message_sync_lookback_minutes }} minutes
+                    with a limit of {{ message_sync_limit_per_channel }} messages per channel.
+                </p>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" href="/ops/channels">Manage Channels</a>
+                <a class="secondary-link" href="/ops/interpreted-trades">Open Interpreted Trades</a>
+                <button id="interpret-trades-button" class="secondary-button" type="button">Interpret Trades Now</button>
+                <button id="sync-messages-button" class="primary-button" type="button">Sync Messages Now</button>
+            </div>
+        </section>
+
+        <p id="status-message" class="status" aria-live="polite"></p>
+
+        <section class="panel" aria-labelledby="messages-heading">
+            <div class="panel-header">
+                <h2 id="messages-heading">messages_read Rows</h2>
+                <span id="message-count" class="count">{{ messages|length }} messages</span>
+            </div>
+
+            <div class="table-wrap">
+                <table class="messages-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Channel</th>
+                            <th scope="col">Message</th>
+                            <th scope="col">Message ID</th>
+                            <th scope="col">Processed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="messages-body">
+                        {% for message in messages %}
+                        <tr>
+                            <td>
+                                <span class="channel-name">{{ message.channel_name }}</span>
+                                <code>{{ message.channel_id }}</code>
+                            </td>
+                            <td>
+                                <span class="message-text">{{ message.message_text or "No text content" }}</span>
+                                <code>{{ message.message_time }}</code>
+                            </td>
+                            <td><code>{{ message.message_id }}</code></td>
+                            <td>
+                                <span class="badge {% if message.processed %}success{% else %}muted{% endif %}">
+                                    {{ "processed" if message.processed else "pending" }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="empty-state" class="empty" {% if messages %}hidden{% endif %}>
+                No MessageRead rows are stored yet. Enable channels, then run a message sync.
+            </div>
+        </section>
+    </main>
+</body>
+</html>

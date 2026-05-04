@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Telegram Channels</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='ops/channels.css') }}">
+    <script defer src="{{ url_for('static', path='ops/channels.js') }}"></script>
+</head>
+<body>
+    <main class="shell">
+        <nav class="top-nav" aria-label="Ops navigation">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link active" href="/ops/channels" aria-current="page">Channels</a>
+            <a class="nav-link" href="/ops/messages-read">MessageRead</a>
+            <a class="nav-link" href="/ops/interpreted-trades">Interpreted Trades</a>
+            <a class="nav-link" href="/ops/jobs">Jobs</a>
+        </nav>
+
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Ops</p>
+                <h1>Telegram Channels</h1>
+                <p class="lede">
+                    Review channels discovered from your Telegram session and choose which ones are enabled.
+                    Automatic sync runs every {{ sync_interval_minutes }} minutes.
+                </p>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" href="/ops/messages-read">Open MessageRead</a>
+                <a class="secondary-link" href="/ops/jobs">Open Jobs</a>
+                <button id="sync-button" class="primary-button" type="button">Sync Channels Now</button>
+            </div>
+        </section>
+
+        <p id="status-message" class="status" aria-live="polite"></p>
+
+        <section class="panel" aria-labelledby="channels-heading">
+            <div class="panel-header">
+                <h2 id="channels-heading">Channel Model</h2>
+                <span id="channel-count" class="count">{{ channels|length }} channels</span>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Channel</th>
+                            <th scope="col">Enabled</th>
+                        </tr>
+                    </thead>
+                    <tbody id="channels-body">
+                        {% for channel in channels %}
+                        <tr data-channel-id="{{ channel.id }}">
+                            <td>
+                                <span class="channel-name">{{ channel.name }}</span>
+                                <code>{{ channel.id }}</code>
+                            </td>
+                            <td>
+                                <label class="switch">
+                                    <input class="channel-toggle" type="checkbox" {% if channel.enabled %}checked{% endif %}>
+                                    <span>Toggle {{ channel.name }}</span>
+                                </label>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="empty-state" class="empty" {% if channels %}hidden{% endif %}>
+                No channels are stored yet. Run a manual sync to populate the table.
+            </div>
+        </section>
+    </main>
+</body>
+</html>

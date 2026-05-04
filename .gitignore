@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+/runtime/mainsession.session
+/runtime/*.db
+/runtime/*.sqlite
+/runtime/*.sqlite3
+
+.venv/
+graphify-out/
+obsidian-vault/
+
+/.idea/dataSources.xml

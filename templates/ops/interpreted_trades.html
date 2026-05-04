@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interpreted Trades</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='ops/channels.css') }}">
+    <script defer src="{{ url_for('static', path='ops/interpreted_trades.js') }}"></script>
+</head>
+<body>
+    <main class="shell">
+        <nav class="top-nav" aria-label="Ops navigation">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/ops/channels">Channels</a>
+            <a class="nav-link" href="/ops/messages-read">MessageRead</a>
+            <a class="nav-link active" href="/ops/interpreted-trades" aria-current="page">Interpreted Trades</a>
+            <a class="nav-link" href="/ops/jobs">Jobs</a>
+        </nav>
+
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Ops</p>
+                <h1>Interpreted Trades</h1>
+                <p class="lede">
+                    Inspect trade signals parsed from MessageRead rows. Automatic interpretation runs every
+                    {{ trade_interpretation_interval_minutes }} minutes.
+                </p>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" href="/ops/messages-read">Open MessageRead</a>
+                <a class="secondary-link" href="/ops/jobs">Open Jobs</a>
+                <button id="interpret-trades-button" class="primary-button" type="button">Interpret Trades Now</button>
+            </div>
+        </section>
+
+        <p id="status-message" class="status" aria-live="polite"></p>
+
+        <section class="panel" aria-labelledby="trades-heading">
+            <div class="panel-header">
+                <h2 id="trades-heading">interpreted_trades Rows</h2>
+                <span id="trade-count" class="count">{{ trades|length }} trades</span>
+            </div>
+
+            <div class="table-wrap">
+                <table class="trades-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Channel</th>
+                            <th scope="col">Trade</th>
+                            <th scope="col">Entry Price</th>
+                            <th scope="col">Stop Loss</th>
+                            <th scope="col">Source</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trades-body">
+                        {% for trade in trades %}
+                        <tr>
+                            <td>
+                                <span class="channel-name">{{ trade.channel_name }}</span>
+                                <code>{{ trade.channel_id }}</code>
+                            </td>
+                            <td>
+                                <span class="trade-symbol">{{ trade.symbol }}</span>
+                                <span class="badge muted">{{ trade.side }}</span>
+                                <code>uuid {{ trade.trade_uuid or "n/a" }}</code>
+                            </td>
+                            <td><code>{{ trade.entry_price or "n/a" }}</code></td>
+                            <td><code>{{ trade.stoploss }}</code></td>
+                            <td>
+                                <span class="message-text">{{ trade.message_text or "No text content" }}</span>
+                                <code>{{ trade.message_time }} - message {{ trade.message_id }}</code>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="empty-state" class="empty" {% if trades %}hidden{% endif %}>
+                No InterpretedTrade rows are stored yet. Run trade interpretation after syncing messages.
+            </div>
+        </section>
+    </main>
+</body>
+</html>

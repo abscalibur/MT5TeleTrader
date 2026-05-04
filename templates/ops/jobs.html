@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scheduled Jobs</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='ops/channels.css') }}">
+    <script defer src="{{ url_for('static', path='ops/jobs.js') }}"></script>
+</head>
+<body>
+    <main class="shell">
+        <nav class="top-nav" aria-label="Ops navigation">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/ops/channels">Channels</a>
+            <a class="nav-link" href="/ops/messages-read">MessageRead</a>
+            <a class="nav-link" href="/ops/interpreted-trades">Interpreted Trades</a>
+            <a class="nav-link active" href="/ops/jobs" aria-current="page">Jobs</a>
+        </nav>
+
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Ops</p>
+                <h1>Scheduled Jobs</h1>
+                <p class="lede">
+                    Review all registered APScheduler jobs, their next run time, latest run status, and last result.
+                    Use the run button to trigger a job without changing its schedule.
+                </p>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" href="/ops/messages-read">Open MessageRead</a>
+                <a class="secondary-link" href="/ops/interpreted-trades">Open Interpreted Trades</a>
+                <button id="refresh-jobs-button" class="primary-button" type="button">Refresh Jobs</button>
+            </div>
+        </section>
+
+        <p id="status-message" class="status" aria-live="polite"></p>
+
+        <section class="panel" aria-labelledby="jobs-heading">
+            <div class="panel-header">
+                <h2 id="jobs-heading">Scheduler Jobs</h2>
+                <span id="job-count" class="count">{{ jobs|length }} jobs</span>
+            </div>
+
+            <div class="table-wrap">
+                <table class="jobs-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Job</th>
+                            <th scope="col">Schedule</th>
+                            <th scope="col">Last Run</th>
+                            <th scope="col">Last Result</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobs-body">
+                        {% for job in jobs %}
+                        <tr data-job-id="{{ job.id }}">
+                            <td>
+                                <span class="channel-name">{{ job.name }}</span>
+                                <code>{{ job.id }}</code>
+                            </td>
+                            <td>
+                                <span class="channel-name">Every {{ job.interval_minutes }} minutes</span>
+                                <code>{{ job.next_run_time or "Not scheduled" }}</code>
+                            </td>
+                            <td>
+                                <span class="badge muted">{{ job.last_status }}</span>
+                                <code>{{ job.last_run_at or "Never" }}</code>
+                            </td>
+                            <td>
+                                <span class="job-result">{{ job.last_error or job.last_result or "No result yet" }}</span>
+                            </td>
+                            <td>
+                                <button class="secondary-button run-job-button" type="button">Run Now</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="empty-state" class="empty" {% if jobs %}hidden{% endif %}>
+                No scheduled jobs are registered.
+            </div>
+        </section>
+    </main>
+</body>
+</html>
