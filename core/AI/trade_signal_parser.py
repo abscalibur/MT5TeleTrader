@@ -13,6 +13,10 @@ from core.AI.trade_signal_prompt import TRADE_SIGNAL_SYSTEM_PROMPT
 
 NUMBER_RE = r"(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
 NUMBER_TOKEN_RE = re.compile(rf"(?<![A-Z0-9])(?P<number>{NUMBER_RE})(?![A-Z0-9])")
+LINK_RE = re.compile(
+    r"(?:https?://|www\.|\b(?:t\.me|telegram\.me|telegram\.dog)/)",
+    re.IGNORECASE,
+)
 
 GOLD_PATTERNS = [
     r"\bGOLD\b",
@@ -171,6 +175,9 @@ def parse_trade_signal_with_llm(
 ) -> dict[str, Any]:
     if not raw_signal or not raw_signal.strip():
         return {"error": True, "message": "invalid signal"}
+
+    if contains_link(raw_signal):
+        return {"error": True, "message": "links are not allowed"}
 
     last_validation_error: str | None = None
 
@@ -339,6 +346,9 @@ def success_response_from_expected_trades(expected_trades: list[ExpectedValidTra
 
 
 def expected_from_signal(raw_signal: str) -> SignalExpectation:
+    if contains_link(raw_signal):
+        return SignalExpectation("links are not allowed", None)
+
     text = normalize_text(raw_signal)
 
     has_gold = has_any_pattern(text, GOLD_PATTERNS)
@@ -564,6 +574,10 @@ def normalize_text(text: str) -> str:
     normalized = re.sub(r"(?<!\d),(?!\d)", " ", normalized)
     normalized = re.sub(r"[/\\:;=@|()\[\]{}<>\"'`~!?\*\n\r\t_+\-]", " ", normalized)
     return re.sub(r"\s+", " ", normalized).strip()
+
+
+def contains_link(text: str) -> bool:
+    return LINK_RE.search(str(text or "")) is not None
 
 
 def parse_number(raw_number: str) -> tuple[int | float, Decimal]:

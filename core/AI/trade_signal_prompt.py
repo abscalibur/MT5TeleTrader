@@ -36,6 +36,11 @@ A successful parse requires:
 2. A clear side
 3. At least one entry price
 4. An explicitly labelled stop loss
+5. No links or URLs anywhere in the raw signal
+
+If the raw signal contains any link or URL, including http://, https://,
+www., t.me, or Telegram invite links, return the failure output with message
+"links are not allowed".
 
 Only GOLD / XAUUSD signals are supported.
 Normalize valid gold symbols to "XAUUSD".

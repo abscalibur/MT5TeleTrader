@@ -179,6 +179,41 @@ class TradeSignalParserTests(unittest.TestCase):
 
         self.assertEqual(parsed["trades"][0]["entry_price"], 2350)
 
+    def test_signal_with_link_is_rejected(self) -> None:
+        parsed = validate_model_json(
+            {
+                "error": False,
+                "trades": [
+                    {
+                        "symbol": "XAUUSD",
+                        "side": "buy",
+                        "entry_price": 4543,
+                        "stop_loss": 4523,
+                    }
+                ],
+            },
+            "XAUUSD BUY 4543 TP 4546 SL 4523 VIP GROUP JOIN FAST https://t.me/+NAIP137_tt8wOTBk",
+        )
+
+        self.assertEqual(parsed, {"error": True, "message": "links are not allowed"})
+
+    def test_signal_with_link_skips_llm_call(self) -> None:
+        with patch("core.AI.trade_signal_parser._call_openai_compatible_llm") as llm_call:
+            parsed = parse_trade_signal_with_llm(
+                "XAUUSD BUY 4543 TP 4546 SL 4523 https://t.me/+NAIP137_tt8wOTBk",
+                api_key="test-key",
+                base_url="https://example.invalid/v1",
+                model="test-model",
+                reasoning_effort=None,
+                temperature=0,
+                max_tokens=500,
+                retries=0,
+                timeout_seconds=1,
+            )
+
+        self.assertEqual(parsed, {"error": True, "message": "links are not allowed"})
+        llm_call.assert_not_called()
+
     def test_success_payload_must_use_trades_list(self) -> None:
         with self.assertRaises(TradeSignalValidationError):
             validate_model_json(
