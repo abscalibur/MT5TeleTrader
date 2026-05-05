@@ -213,12 +213,14 @@ def calculate_take_profit(side: str, open_price: Decimal, stop_loss: Decimal) ->
     if side == "buy":
         if stop_loss >= open_price:
             raise InvalidTradeError("buy stop loss must be below open price")
-        return open_price + (open_price - stop_loss)
+        # return open_price + (open_price - stop_loss)
+        return open_price + 5
 
     if side == "sell":
         if stop_loss <= open_price:
             raise InvalidTradeError("sell stop loss must be above open price")
-        return open_price - (stop_loss - open_price)
+        # return open_price - (stop_loss - open_price)
+        return open_price - 5
 
     raise InvalidTradeError(f"unsupported side: {side}")
 
